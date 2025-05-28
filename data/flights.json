@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1748427631850,
+    "flightNumber": "65099",
+    "from": "Kenya",
+    "to": "South Africa",
+    "date": "2025-05-28T13:20"
+  },
+  {
+    "id": 1748431091554,
+    "flightNumber": "60078",
+    "from": "Kentucky",
+    "to": "Kenya",
+    "date": "2025-05-29T14:17"
+  },
+  {
+    "id": 1748431319489,
+    "flightNumber": "555904",
+    "from": "Mombasa",
+    "to": "Daresalaam ",
+    "date": "2025-05-28T04:21"
+  },
+  {
+    "id": 1748431327425,
+    "flightNumber": "555904",
+    "from": "Mombasa",
+    "to": "Daresalaam ",
+    "date": "2025-05-28T04:21"
+  },
+  {
+    "id": 1748432661508,
+    "flightNumber": "555903",
+    "from": "USA",
+    "to": "Netherlands",
+    "date": "2025-05-28T02:44"
+  }
+]

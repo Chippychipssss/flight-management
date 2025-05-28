@@ -1,0 +1,40 @@
+<!-- public/view-flights.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Flights</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>🛫 All Flights</h2>
+  <table id="flightsTable">
+    <thead>
+      <tr>
+        <th>Flight Number</th>
+        <th>From</th>
+        <th>To</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    fetch('/api/flights')
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.querySelector("#flightsTable tbody");
+        data.forEach(flight => {
+          const row = `<tr>
+            <td>${flight.flightNumber}</td>
+            <td>${flight.from}</td>
+            <td>${flight.to}</td>
+            <td>${flight.date}</td>
+          </tr>`;
+          tbody.innerHTML += row;
+        });
+      });
+  </script>
+</body>
+</html>

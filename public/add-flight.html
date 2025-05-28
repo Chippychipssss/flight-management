@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Flight</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Add New Flight</h2>
+  <!-- public/add-flight.html -->
+<form action="/api/flights" method="POST">
+  <input type="text" name="flightNumber" placeholder="Flight Number" required>
+  <input type="text" name="from" placeholder="From" required>
+  <input type="text" name="to" placeholder="To" required>
+  <input type="datetime-local" name="date" required>
+  <button type="submit">Add Flight</button>
+</form>
+
+</body>
+</html>
