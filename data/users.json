@@ -1,0 +1,86 @@
+[
+  {
+    "username": "arefin@gmail.com",
+    "password": "yellow"
+  },
+  {
+    "username": "Robert",
+    "password": "12345"
+  },
+  {
+    "username": "Wanene",
+    "password": "1998"
+  },
+  {
+    "username": "Maryanne",
+    "password": "mayyan"
+  },
+  {
+    "username": "Tom",
+    "password": "9876"
+  },
+  {
+    "username": "Mr Fred",
+    "password": "9898"
+  },
+  {
+    "username": "rimi",
+    "password": "123456",
+    "role": "admin"
+  },
+  {
+    "username": "Ted",
+    "password": "qwert",
+    "role": "user"
+  },
+  {
+    "username": "Alfred",
+    "password": "zxcvb",
+    "role": "admin"
+  },
+  {
+    "username": "Madam Purity",
+    "password": "4567",
+    "role": "admin"
+  },
+  {
+    "username": "Alex",
+    "password": "zxcv",
+    "role": "user"
+  },
+  {
+    "username": "roblox",
+    "password": "qwert",
+    "role": "admin"
+  },
+  {
+    "username": "Mr Cho",
+    "password": "qwert",
+    "role": "admin"
+  },
+  {
+    "username": "luke",
+    "password": "7890",
+    "role": "admin"
+  },
+  {
+    "username": "Drex",
+    "password": "tyui",
+    "role": "user"
+  },
+  {
+    "username": "Alpha",
+    "password": "zxcv",
+    "role": "admin"
+  },
+  {
+    "username": "Omega",
+    "password": "asdfg",
+    "role": "admin"
+  },
+  {
+    "username": "Alphaxard",
+    "password": "1234",
+    "role": "admin"
+  }
+]

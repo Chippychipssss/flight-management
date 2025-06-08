@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h2>✈️ Flight Management System</h2>
+  <p id="welcome">Welcome!</p>
+
+  <nav id="navbar">
+    <!-- Navigation links added via JS -->
+  </nav>
+
+  <p>Welcome! Choose an option to manage flights.</p>
+
+  <script>
+    // Get user from session
+    fetch('/api/current-user')
+      .then(res => res.json())
+      .then(user => {
+        if (!user.username) return location.href = '/login.html';
+
+        document.getElementById("welcome").innerText = `Welcome, ${user.username}!`;
+
+        const nav = document.getElementById("navbar");
+
+        let links = `
+          <a href="/old-index.html">📊 Dashboard</a> |
+          <a href="/view-bookings.html">📋 View Bookings</a> |
+        `;
+
+        if (user.role === 'admin') {
+          links += `<a href="/add-flight.html">➕ Add Flight</a> |`;
+        } else {
+          links += `<a href="/my-bookings.html">🧾 My Bookings</a> |`;
+        }
+
+        links += `<a href="/logout">🚪 Logout</a>`;
+        nav.innerHTML = links;
+      })
+      .catch(() => location.href = '/login.html');
+  </script>
+</body>
+</html>

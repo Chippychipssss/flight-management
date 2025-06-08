@@ -1,16 +1,95 @@
+<!-- public/view-bookings.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>View Bookings</title>
+  <title>📋 View Bookings</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f1f5f9;
+      color: #1e293b;
+      padding: 30px;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+    }
+
+    nav {
+      margin-bottom: 25px;
+    }
+
+    nav a {
+      margin: 0 10px;
+      text-decoration: none;
+      font-weight: bold;
+      color: #2563eb;
+      border: 1px solid transparent;
+      padding: 8px 14px;
+      border-radius: 6px;
+      transition: 0.3s;
+    }
+
+    nav a:hover {
+      background: #dbeafe;
+    }
+
+    table {
+      margin: auto;
+      width: 90%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    th {
+      background: #f8fafc;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
 <body>
   <h2>📋 Current Bookings</h2>
-  <table>
-    <tr><th>Passenger</th><th>Flight</th><th>Date</th></tr>
-    <tr><td>John Doe</td><td>KQ301</td><td>2025-06-12</td></tr>
-    <tr><td>Jane Smith</td><td>KQ311</td><td>2025-06-13</td></tr>
+
+  <nav>
+    <a href="/dashboard.html">📊 Dashboard</a>
+    <a href="/view-flights.html">🛫 View Flights</a>
+    <a href="/logout">🚪 Logout</a>
+  </nav>
+
+  <table id="bookingsTable">
+    <thead>
+      <tr><th>Passenger</th><th>Flight</th><th>Date</th></tr>
+    </thead>
+    <tbody>
+      <!-- Rows will be inserted here dynamically -->
+    </tbody>
   </table>
+
+  <script>
+    fetch('/api/bookings')
+      .then(res => res.json())
+      .then(bookings => {
+        const table = document.querySelector('#bookingsTable tbody');
+        bookings.forEach(b => {
+          const row = document.createElement('tr');
+          row.innerHTML = `<td>${b.passengerName}</td><td>${b.flightNumber}</td><td>${b.date}</td>`;
+          table.appendChild(row);
+        });
+      })
+      .catch(err => {
+        console.error('Error loading bookings:', err);
+      });
+  </script>
 </body>
 </html>

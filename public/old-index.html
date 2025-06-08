@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flight Management System</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 10px;
+    }
+    nav a {
+      margin: 0 12px;
+      text-decoration: none;
+      font-weight: bold;
+      color: #2563eb;
+      border: 1px solid transparent;
+      padding: 8px 14px;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+    nav a:hover {
+      background: #dbeafe;
+      border-color: #93c5fd;
+    }
+    table {
+      margin: 30px auto;
+      width: 90%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+    }
+    th {
+      background: #f1f5f9;
+    }
+  </style>
+</head>
+<body>
+  <h1>✈️ Flight Management System</h1>
+  <p id="userWelcome">Welcome!</p>
+
+  <nav id="navLinks"></nav>
+
+  <p>Choose an option to manage flights.</p>
+
+  <h3>🛫 Available Flights</h3>
+  <table id="flightsTable">
+    <thead>
+      <tr><th>Flight Number</th><th>From</th><th>To</th><th>Date</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    // Session check + navigation
+    fetch('/api/me')
+      .then(res => res.json())
+      .then(user => {
+        if (!user.username) return location.href = '/login.html';
+
+        document.getElementById('userWelcome').innerText = `Welcome, ${user.username}!`;
+
+        let links = `
+          <a href="view-flights.html">🛫 View Flights</a>
+          <a href="view-bookings.html">📋 View Bookings</a>
+        `;
+
+        if (user.role === 'admin') {
+          links = `
+            <a href="add-flight.html">➕ Add Flight</a>
+            <a href="book-flight.html">🎟️ Book Ticket</a>
+          ` + links;
+        }
+
+        links += `<a href="/logout">🚪 Logout</a>`;
+        document.getElementById("navLinks").innerHTML = links;
+      });
+
+    // Load flights
+    fetch('/api/flights')
+      .then(res => res.json())
+      .then(flights => {
+        const table = document.querySelector("#flightsTable tbody");
+        flights.forEach(f => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${f.flightNumber}</td>
+            <td>${f.from}</td>
+            <td>${f.to}</td>
+            <td>${f.date}</td>
+          `;
+          table.appendChild(row);
+        });
+      });
+  </script>
+</body>
+</html>

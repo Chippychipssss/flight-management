@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1748510017956,
+    "passengerName": "John Doe",
+    "flightNumber": "KQ23564",
+    "date": "2025-05-29"
+  },
+  {
+    "id": 1748513548818,
+    "passengerName": "Agnes",
+    "flightNumber": "500045",
+    "date": "2025-05-29"
+  },
+  {
+    "id": 1748514203805,
+    "passengerName": "Robert Rimi",
+    "flightNumber": "2345678",
+    "date": "2025-05-29"
+  },
+  {
+    "id": 1748592571329,
+    "passengerName": "Lawrence",
+    "flightNumber": "KQ9087",
+    "date": "2025-05-30"
+  },
+  {
+    "id": 1748947584028,
+    "passengerName": "Fiona",
+    "flightNumber": "KQ555123",
+    "date": "2025-06-03"
+  },
+  {
+    "id": 1749026475646,
+    "passengerName": {
+      "username": "Alpha",
+      "role": "admin"
+    },
+    "flightNumber": "KQ333421",
+    "date": "2025-06-04"
+  },
+  {
+    "id": 1749027521366,
+    "passengerName": "Maryanne",
+    "flightNumber": "KQL33390",
+    "date": "2025-06-04"
+  }
+]

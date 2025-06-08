@@ -21,17 +21,31 @@
     "date": "2025-05-28T04:21"
   },
   {
-    "id": 1748431327425,
-    "flightNumber": "555904",
-    "from": "Mombasa",
-    "to": "Daresalaam ",
-    "date": "2025-05-28T04:21"
-  },
-  {
     "id": 1748432661508,
     "flightNumber": "555903",
     "from": "USA",
     "to": "Netherlands",
     "date": "2025-05-28T02:44"
+  },
+  {
+    "id": 1748440497370,
+    "flightNumber": "kq1234",
+    "from": "Kenya",
+    "to": "Netherlands",
+    "date": "2025-05-30T05:54"
+  },
+  {
+    "id": 1748592514484,
+    "flightNumber": "300045",
+    "from": "Joburg",
+    "to": "Kenya",
+    "date": "2025-05-30T11:08"
+  },
+  {
+    "id": 1748941579202,
+    "flightNumber": "MQ789444",
+    "from": "Lusaka",
+    "to": "South Africa",
+    "date": "2025-07-21T02:00"
   }
 ]

@@ -1,3 +1,4 @@
+<!-- book-flight.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,9 +8,9 @@
 </head>
 <body>
   <h2>Book a Flight</h2>
-  <form>
-    <input type="text" placeholder="Passenger Name" required>
-    <input type="text" placeholder="Flight Number" required>
+  <form action="/api/bookings" method="POST">
+    <input type="text" name="passengerName" placeholder="Passenger Name" required>
+    <input type="text" name="flightNumber" placeholder="Flight Number" required>
     <button type="submit">Book Ticket</button>
   </form>
 </body>
