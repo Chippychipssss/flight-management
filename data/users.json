@@ -12,10 +12,6 @@
     "password": "1998"
   },
   {
-    "username": "Maryanne",
-    "password": "mayyan"
-  },
-  {
     "username": "Tom",
     "password": "9876"
   },
@@ -82,5 +78,15 @@
     "username": "Alphaxard",
     "password": "1234",
     "role": "admin"
+  },
+  {
+    "username": "Mwaura",
+    "password": "6789",
+    "role": "user"
+  },
+  {
+    "username": "Maryanne",
+    "password": "mayyan",
+    "role": "user"
   }
 ]

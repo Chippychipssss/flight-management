@@ -69,6 +69,34 @@
     button:hover {
       background: #dc2626;
     }
+
+    /* 🧱 Modal styles */
+    #confirmModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      justify-content: center;
+      align-items: center;
+    }
+
+    #confirmModal .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    #confirmModal .modal-buttons {
+      margin-top: 20px;
+    }
+
+    #confirmModal button {
+      margin: 0 10px;
+      padding: 8px 16px;
+    }
   </style>
 </head>
 <body>
@@ -93,7 +121,21 @@
     <tbody></tbody>
   </table>
 
+  <!-- ✅ Modal HTML -->
+  <div id="confirmModal">
+    <div class="modal-content">
+      <p id="confirmText">Are you sure?</p>
+      <div class="modal-buttons">
+        <button id="confirmYes">✅ Yes</button>
+        <button id="confirmNo">❌ Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    let flightToDeleteId = null;
+
+    // Load flights and user
     fetch('/api/current-user')
       .then(res => res.json())
       .then(user => {
@@ -111,7 +153,7 @@
                 <td>${flight.to}</td>
                 <td>${flight.date}</td>
                 <td>
-                  ${isAdmin ? `<button onclick="deleteFlight(${flight.id})">🗑️ Delete</button>` : ''}
+                  ${isAdmin ? `<button onclick="promptDelete(${flight.id}, '${flight.flightNumber}')">🗑️ Delete</button>` : ''}
                 </td>
               `;
               tbody.appendChild(row);
@@ -119,18 +161,25 @@
           });
       });
 
-    function deleteFlight(flightId) {
-      if (confirm("Delete this flight?")) {
-        fetch(`/api/flights/${flightId}`, {
-          method: "DELETE"
-        })
+    function promptDelete(id, flightNumber) {
+      flightToDeleteId = id;
+      document.getElementById('confirmText').innerText = `Delete flight ${flightNumber}?`;
+      document.getElementById('confirmModal').style.display = 'flex';
+    }
+
+    document.getElementById('confirmYes').onclick = () => {
+      fetch(`/api/flights/${flightToDeleteId}`, { method: 'DELETE' })
         .then(res => res.text())
         .then(msg => {
           alert(msg);
           location.reload();
         });
-      }
-    }
+    };
+
+    document.getElementById('confirmNo').onclick = () => {
+      document.getElementById('confirmModal').style.display = 'none';
+      flightToDeleteId = null;
+    };
   </script>
 </body>
 </html>
