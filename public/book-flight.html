@@ -1,17 +1,152 @@
-<!-- book-flight.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Book Ticket</title>
+  <title>🎟️ Book Ticket</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0f172a;
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    header {
+      background-color: #0f172a;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    header img {
+      height: 40px;
+      border-radius: 8px;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      margin: 20px 0;
+    }
+
+    form {
+      margin-top: 20px;
+    }
+
+    input, select {
+      padding: 10px;
+      margin: 10px;
+      width: 250px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    #msg {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h2>Book a Flight</h2>
-  <form action="/api/bookings" method="POST">
-    <input type="text" name="passengerName" placeholder="Passenger Name" required>
-    <input type="text" name="flightNumber" placeholder="Flight Number" required>
+  <header>
+    <img src="aeroconnect-logo.png" alt="AeroConnect Logo">
+    <h1>AeroConnect – Flight Management System</h1>
+  </header>
+
+  <h2>🎟️ Book a Flight</h2>
+
+  <form id="bookingForm">
+    <input type="text" id="passengerName" name="passengerName" placeholder="Passenger Name" required readonly>
+    
+    <select id="flightNumber" name="flightNumber" required>
+      <option value="">✈️ Select Flight Number</option>
+    </select>
+
+    <input type="date" id="date" name="date" required readonly>
+    <br>
     <button type="submit">Book Ticket</button>
+    <div id="msg"></div>
   </form>
+
+  <script>
+    const userField = document.getElementById("passengerName");
+    const flightSelect = document.getElementById("flightNumber");
+    const dateField = document.getElementById("date");
+    const msg = document.getElementById("msg");
+
+    let flights = [];
+
+    fetch('/api/me')
+      .then(res => res.json())
+      .then(user => {
+        if (!user.username) return location.href = '/login.html';
+        userField.value = user.username;
+      });
+
+    fetch('/api/flights')
+      .then(res => res.json())
+      .then(data => {
+        flights = data;
+        data.forEach(flight => {
+          const bookings = flight.bookings || [];
+          const remaining = flight.seats - bookings.length;
+          const status = remaining <= 0 ? ' (Fully Booked)' : '';
+          const option = document.createElement("option");
+          option.value = flight.flightNumber;
+          option.text = `${flight.flightNumber} - ${flight.from} → ${flight.to}${status}`;
+          option.disabled = remaining <= 0;
+          flightSelect.appendChild(option);
+        });
+      });
+
+    flightSelect.addEventListener("change", () => {
+      const selected = flights.find(f => f.flightNumber === flightSelect.value);
+      if (selected) {
+        dateField.value = selected.date;
+      }
+    });
+
+    document.getElementById("bookingForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      msg.textContent = "⏳ Booking...";
+      msg.style.color = "white";
+
+      const formData = new FormData(e.target);
+      const body = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch("/api/bookings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+
+        const text = await res.text();
+        msg.textContent = text;
+        msg.style.color = res.ok ? "lightgreen" : "red";
+        if (res.ok) e.target.reset();
+      } catch (err) {
+        msg.textContent = "❌ Failed to book.";
+        msg.style.color = "red";
+      }
+    });
+  </script>
 </body>
 </html>

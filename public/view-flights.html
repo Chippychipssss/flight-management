@@ -1,33 +1,41 @@
-<!-- public/view-flights.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>🛫 View Flights</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f1f5f9;
-      color: #1e293b;
+      background-color: #0f172a;
+      color: white;
       padding: 30px;
       text-align: center;
     }
 
-    h2 {
-      font-size: 1.8rem;
-      margin-bottom: 15px;
+    header {
+      background-color: #0f172a;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    header img {
+      height: 40px;
+      border-radius: 8px;
     }
 
     nav {
-      margin-bottom: 25px;
+      margin: 20px 0;
     }
 
     nav a {
       margin: 0 10px;
       text-decoration: none;
       font-weight: bold;
-      color: #2563eb;
+      color: #93c5fd;
       border: 1px solid transparent;
       padding: 8px 14px;
       border-radius: 6px;
@@ -35,15 +43,25 @@
     }
 
     nav a:hover {
-      background: #dbeafe;
+      background: #1e3a8a;
+      border-color: #60a5fa;
+    }
+
+    #searchInput {
+      padding: 10px;
+      width: 60%;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
     }
 
     table {
       margin: auto;
-      width: 90%;
+      width: 95%;
       border-collapse: collapse;
       background: white;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      color: black;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
     }
 
     th, td {
@@ -52,9 +70,9 @@
     }
 
     th {
-      background: #f8fafc;
+      background: #f1f5f9;
       text-transform: uppercase;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
 
     button {
@@ -66,20 +84,20 @@
       color: white;
     }
 
-    .delete-btn {
-      background: #ef4444;
-    }
-
-    .delete-btn:hover {
-      background: #dc2626;
-    }
-
     .edit-btn {
       background: #3b82f6;
     }
 
     .edit-btn:hover {
       background: #2563eb;
+    }
+
+    .delete-btn {
+      background: #ef4444;
+    }
+
+    .delete-btn:hover {
+      background: #dc2626;
     }
 
     .modal {
@@ -100,7 +118,8 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.3);
     }
 
-    .modal-content input {
+    .modal-content input,
+    .modal-content select {
       margin-bottom: 10px;
       padding: 8px;
       width: 90%;
@@ -116,6 +135,11 @@
   </style>
 </head>
 <body>
+  <header>
+    <img src="aeroconnect-logo.png" alt="AeroConnect Logo" />
+    <h1>AeroConnect – Flight Management System</h1>
+  </header>
+
   <h2>🛫 All Flights</h2>
 
   <nav>
@@ -123,6 +147,8 @@
     <a href="/view-bookings.html">📋 View Bookings</a>
     <a href="/logout">🚪 Logout</a>
   </nav>
+
+  <input type="text" id="searchInput" placeholder="Search by destination or date..." />
 
   <table id="flightsTable">
     <thead>
@@ -132,13 +158,16 @@
         <th>To</th>
         <th>Date</th>
         <th>Time</th>
+        <th>Route</th>
+        <th>Class</th>
+        <th>Price</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
 
-  <!-- 🧱 Delete Modal -->
+  <!-- Delete Modal -->
   <div id="confirmModal" class="modal">
     <div class="modal-content">
       <p id="confirmText">Are you sure?</p>
@@ -149,15 +178,23 @@
     </div>
   </div>
 
-  <!-- ✏️ Edit Modal -->
+  <!-- Edit Modal -->
   <div id="editModal" class="modal">
     <div class="modal-content">
       <h3>Edit Flight</h3>
       <input id="editFlightNumber" placeholder="Flight Number" />
       <input id="editFrom" placeholder="From" />
       <input id="editTo" placeholder="To" />
-      <input id="editDate" type="date" placeholder="Date" />
-      <input id="editTime" type="time" placeholder="Time" />
+      <input id="editDate" type="date" />
+      <input id="editTime" type="time" />
+      <input id="editRoute" placeholder="Route" />
+      <input id="editPrice" type="number" placeholder="Price (KSH)" />
+      <select id="editClass">
+        <option value="" disabled selected>Select Class</option>
+        <option value="Economy">Economy</option>
+        <option value="Business">Business</option>
+        <option value="First Class">First Class</option>
+      </select>
       <div class="modal-buttons">
         <button onclick="submitEdit()">💾 Save</button>
         <button onclick="closeEditModal()">❌ Cancel</button>
@@ -168,43 +205,67 @@
   <script>
     let flightToDeleteId = null;
     let flightToEditId = null;
+    let allFlights = [];
+    const tbody = document.querySelector("#flightsTable tbody");
+
+    function renderFlights(flights, isAdmin) {
+      tbody.innerHTML = "";
+      flights.forEach(flight => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${flight.flightNumber}</td>
+          <td>${flight.from}</td>
+          <td>${flight.to}</td>
+          <td>${flight.date}</td>
+          <td>${flight.time || '—'}</td>
+          <td>${flight.route || '—'}</td>
+          <td>${flight.class || '—'}</td>
+          <td>KSH ${flight.price || '—'}</td>
+          <td>
+            ${isAdmin ? `
+              <button class="edit-btn" onclick="openEditModal(${flight.id}, '${flight.flightNumber}', '${flight.from}', '${flight.to}', '${flight.date}', '${flight.time || ''}', '${flight.route || ''}', '${flight.class || ''}', '${flight.price || ''}')">✏️ Edit</button>
+              <button class="delete-btn" onclick="promptDelete(${flight.id}, '${flight.flightNumber}')">🗑️ Delete</button>
+            ` : ''}
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
 
     fetch('/api/current-user')
       .then(res => res.json())
       .then(user => {
         const isAdmin = user.role === 'admin';
-
         fetch('/api/flights')
           .then(res => res.json())
           .then(flights => {
-            const tbody = document.querySelector("#flightsTable tbody");
-            flights.forEach(flight => {
-              const row = document.createElement("tr");
-              row.innerHTML = `
-                <td>${flight.flightNumber}</td>
-                <td>${flight.from}</td>
-                <td>${flight.to}</td>
-                <td>${flight.date}</td>
-                <td>${flight.time || '—'}</td>
-                <td>
-                  ${isAdmin ? `
-                    <button class="edit-btn" onclick="openEditModal(${flight.id}, '${flight.flightNumber}', '${flight.from}', '${flight.to}', '${flight.date}', '${flight.time || ''}')">✏️ Edit</button>
-                    <button class="delete-btn" onclick="promptDelete(${flight.id}, '${flight.flightNumber}')">🗑️ Delete</button>
-                  ` : ''}
-                </td>
-              `;
-              tbody.appendChild(row);
-            });
+            allFlights = flights;
+            renderFlights(allFlights, isAdmin);
           });
       });
 
-    function openEditModal(id, number, from, to, date, time) {
+    document.getElementById("searchInput").addEventListener("input", function () {
+      const query = this.value.toLowerCase();
+      const filtered = allFlights.filter(f =>
+        f.from.toLowerCase().includes(query) ||
+        f.to.toLowerCase().includes(query) ||
+        f.date.includes(query)
+      );
+      fetch('/api/current-user')
+        .then(res => res.json())
+        .then(user => renderFlights(filtered, user.role === 'admin'));
+    });
+
+    function openEditModal(id, number, from, to, date, time, route, flightClass, price) {
       flightToEditId = id;
       document.getElementById("editFlightNumber").value = number;
       document.getElementById("editFrom").value = from;
       document.getElementById("editTo").value = to;
       document.getElementById("editDate").value = date;
       document.getElementById("editTime").value = time;
+      document.getElementById("editRoute").value = route;
+      document.getElementById("editClass").value = flightClass;
+      document.getElementById("editPrice").value = price;
       document.getElementById("editModal").style.display = "flex";
     }
 
@@ -218,7 +279,10 @@
         from: document.getElementById("editFrom").value,
         to: document.getElementById("editTo").value,
         date: document.getElementById("editDate").value,
-        time: document.getElementById("editTime").value
+        time: document.getElementById("editTime").value,
+        route: document.getElementById("editRoute").value,
+        class: document.getElementById("editClass").value,
+        price: document.getElementById("editPrice").value
       };
 
       fetch(`/api/flights/${flightToEditId}`, {

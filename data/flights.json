@@ -36,13 +36,156 @@
     "flightNumber": "KQ45688",
     "from": "Rwanda",
     "to": "Daresalaam",
-    "date": "2025-06-10T12:32"
+    "date": "2025-06-10",
+    "time": "12:32"
   },
   {
     "id": 1749555285189,
     "flightNumber": "KQ 23478",
     "from": "Pretoria",
     "to": "Kenya",
-    "date": "2025-06-11T02:40"
+    "date": "2025-06-11",
+    "time": "02:40"
+  },
+  {
+    "id": 1749622118358,
+    "flightNumber": "KQ555111",
+    "from": "New York",
+    "to": "Kenya",
+    "date": "2025-06-11",
+    "time": "09:08"
+  },
+  {
+    "id": 1749626982906,
+    "flightNumber": "KQ999234",
+    "from": "Kenya",
+    "to": "Joburg",
+    "date": "2025-06-12",
+    "time": "04:00"
+  },
+  {
+    "id": 1749635473581,
+    "flightNumber": "KQ552444",
+    "from": "Netherlands",
+    "to": "Manchester",
+    "date": "2025-06-10",
+    "time": "01:51",
+    "route": "Milan",
+    "class": "First Class",
+    "price": "300000"
+  },
+  {
+    "id": 1749636315000,
+    "flightNumber": "KQ101222",
+    "from": "Kenya",
+    "to": "Malaysia",
+    "route": "Dubai",
+    "price": "90000",
+    "date": "2025-06-11",
+    "time": "02:00"
+  },
+  {
+    "id": 1749636348937,
+    "flightNumber": "KQ101222",
+    "from": "Kenya",
+    "to": "Malaysia",
+    "route": "Dubai",
+    "price": "90000",
+    "date": "2025-06-11",
+    "time": "02:00"
+  },
+  {
+    "id": 1749636991447,
+    "flightNumber": "KQ555221",
+    "from": "India",
+    "to": "Kenya",
+    "route": "JKIA-Dubai",
+    "class": "First Class",
+    "price": "100000",
+    "date": "2025-06-13",
+    "time": "02:15"
+  },
+  {
+    "id": 1749637180490,
+    "flightNumber": "KQ62333",
+    "from": "Kenya",
+    "to": "Malaysia",
+    "route": "Dubai",
+    "class": "Economy",
+    "price": "70000",
+    "date": "2025-06-11",
+    "time": "13:19"
+  },
+  {
+    "id": 1749638754342,
+    "flightNumber": "KQ202541",
+    "from": "Nairobi",
+    "to": "Malindi",
+    "route": "Kisumu",
+    "price": "5000",
+    "seats": 50,
+    "date": "2025-07-04",
+    "time": "01:44",
+    "class": "Economy"
+  },
+  {
+    "id": 1749639158692,
+    "flightNumber": "KQ555333",
+    "from": "USA",
+    "to": "South Africa",
+    "route": "Dubai",
+    "class": "First Class",
+    "price": "250000",
+    "seats": 50,
+    "date": "2025-06-11",
+    "time": "13:52"
+  },
+  {
+    "id": 1718110000000,
+    "flightNumber": "KQ101",
+    "from": "Nairobi",
+    "to": "Cape Town",
+    "route": "JKIA → CPT",
+    "class": "Economy",
+    "price": "15000",
+    "seats": 5,
+    "date": "2025-06-11",
+    "time": "10:00"
+  },
+  {
+    "id": 1749642048680,
+    "flightNumber": "KQ105",
+    "from": "New York",
+    "to": "Amsterdam",
+    "route": "Spain",
+    "class": "First Class",
+    "price": "900000",
+    "seats": 1,
+    "date": "2025-06-11",
+    "time": "14:40"
+  },
+  {
+    "id": 1749646446702,
+    "flightNumber": "KQ104",
+    "from": "Nairobi",
+    "to": "London",
+    "route": "Manchester",
+    "class": "Economy",
+    "price": "50000",
+    "seats": 3,
+    "date": "2025-06-11",
+    "time": "15:53"
+  },
+  {
+    "id": 1749647330005,
+    "flightNumber": "KQ901",
+    "from": "Nairobi",
+    "to": "Canada",
+    "route": "Miami",
+    "class": "Business",
+    "price": "50000",
+    "seats": 2,
+    "date": "2025-06-11",
+    "time": "16:08"
   }
 ]

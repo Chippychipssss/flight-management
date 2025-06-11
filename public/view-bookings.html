@@ -8,26 +8,35 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f1f5f9;
-      color: #1e293b;
+      background-color: #0f172a;
+      color: white;
       padding: 30px;
       text-align: center;
     }
 
-    h2 {
-      font-size: 1.8rem;
-      margin-bottom: 15px;
+    header {
+      background-color: #0f172a;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    header img {
+      height: 40px;
+      border-radius: 8px;
     }
 
     nav {
-      margin-bottom: 25px;
+      margin: 20px 0;
     }
 
     nav a {
       margin: 0 10px;
       text-decoration: none;
       font-weight: bold;
-      color: #2563eb;
+      color: #93c5fd;
       border: 1px solid transparent;
       padding: 8px 14px;
       border-radius: 6px;
@@ -35,7 +44,8 @@
     }
 
     nav a:hover {
-      background: #dbeafe;
+      background: #1e3a8a;
+      border-color: #60a5fa;
     }
 
     table {
@@ -43,7 +53,8 @@
       width: 90%;
       border-collapse: collapse;
       background: white;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      color: black;
+      box-shadow: 0 0 8px rgba(0,0,0,0.2);
     }
 
     th, td {
@@ -52,13 +63,18 @@
     }
 
     th {
-      background: #f8fafc;
+      background: #f1f5f9;
       text-transform: uppercase;
       font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
+  <header>
+    <img src="aeroconnect-logo.png" alt="AeroConnect Logo">
+    <h1>AeroConnect – Flight Management System</h1>
+  </header>
+
   <h2>📋 Current Bookings</h2>
 
   <nav>
@@ -81,11 +97,19 @@
       .then(res => res.json())
       .then(bookings => {
         const table = document.querySelector('#bookingsTable tbody');
-        bookings.forEach(b => {
-          const row = document.createElement('tr');
-          row.innerHTML = `<td>${b.passengerName}</td><td>${b.flightNumber}</td><td>${b.date}</td>`;
-          table.appendChild(row);
-        });
+        if (bookings.length === 0) {
+          table.innerHTML = "<tr><td colspan='3'>No bookings yet.</td></tr>";
+        } else {
+          bookings.forEach(b => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${b.passengerName}</td>
+              <td>${b.flightNumber}</td>
+              <td>${b.date}</td>
+            `;
+            table.appendChild(row);
+          });
+        }
       })
       .catch(err => {
         console.error('Error loading bookings:', err);

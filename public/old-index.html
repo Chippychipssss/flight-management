@@ -1,108 +1,178 @@
+<!-- public/old-index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Flight Management System</title>
+  <title>AeroConnect – Dashboard</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    :root {
+      --brand-blue: #0f172a;
+      --text-light: #ffffff;
+      --link-blue: #60a5fa;
+    }
+
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f1f5f9;
-      color: #1e293b;
+      background: var(--brand-blue);
+      color: var(--text-light);
       text-align: center;
       padding: 30px;
     }
-    h1 {
-      font-size: 1.8em;
-      margin-bottom: 10px;
+
+    header {
+      background-color: var(--brand-blue);
+      padding: 20px;
+      text-align: center;
+      color: var(--text-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
     }
+
+    header img {
+      height: 40px;
+      border-radius: 8px;
+    }
+
     nav a {
       margin: 0 12px;
       text-decoration: none;
       font-weight: bold;
-      color: #2563eb;
+      color: var(--link-blue);
       border: 1px solid transparent;
       padding: 8px 14px;
       border-radius: 8px;
       transition: 0.3s;
     }
+
     nav a:hover {
-      background: #dbeafe;
-      border-color: #93c5fd;
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--link-blue);
     }
+
     table {
       margin: 30px auto;
       width: 90%;
       border-collapse: collapse;
       background: white;
+      color: #1e293b;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
+
     th, td {
       padding: 12px;
       border: 1px solid #e2e8f0;
     }
+
     th {
       background: #f1f5f9;
+    }
+
+    .status-full {
+      color: red;
+      font-weight: bold;
+    }
+
+    .status-available {
+      color: green;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>✈️ Flight Management System</h1>
+  <header>
+    <img src="aeroconnect-logo.png" alt="AeroConnect Logo">
+    <h1>AeroConnect – Flight Management System</h1>
+  </header>
+
   <p id="userWelcome">Welcome!</p>
-
   <nav id="navLinks"></nav>
-
   <p>Choose an option to manage flights.</p>
+
+  <input type="text" id="searchInput" placeholder="Search by destination or date..." style="padding: 10px; width: 60%; margin-top: 10px; border-radius: 6px; border: 1px solid #cbd5e1;">
 
   <h3>🛫 Available Flights</h3>
   <table id="flightsTable">
     <thead>
-      <tr><th>Flight Number</th><th>From</th><th>To</th><th>Date</th></tr>
+      <tr>
+        <th>Flight Number</th>
+        <th>From</th>
+        <th>To</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Status</th>
+      </tr>
     </thead>
     <tbody></tbody>
   </table>
 
   <script>
-    // Session check + navigation
     fetch('/api/me')
       .then(res => res.json())
       .then(user => {
         if (!user.username) return location.href = '/login.html';
-
         document.getElementById('userWelcome').innerText = `Welcome, ${user.username}!`;
 
-        let links = `
-          <a href="view-flights.html">🛫 View Flights</a>
-          <a href="view-bookings.html">📋 View Bookings</a>
-        `;
-
+        let links = `<a href="old-index.html">📊 Dashboard</a>`;
         if (user.role === 'admin') {
-          links = `
+          links += `
             <a href="add-flight.html">➕ Add Flight</a>
             <a href="book-flight.html">🎟️ Book Ticket</a>
-          ` + links;
+            <a href="view-flights.html">🛫 View Flights</a>
+            <a href="view-bookings.html">📋 View Bookings</a>
+          `;
+        } else {
+          links += `
+            <a href="book-flight.html">🎟️ Book Ticket</a>
+            <a href="my-bookings.html">🧾 My Bookings</a>
+          `;
         }
-
         links += `<a href="/logout">🚪 Logout</a>`;
         document.getElementById("navLinks").innerHTML = links;
       });
 
-    // Load flights
+    const table = document.querySelector("#flightsTable tbody");
+    let allFlights = [];
+
+    function renderFlights(flights) {
+      table.innerHTML = "";
+      flights.forEach(f => {
+        const booked = f.bookings ? f.bookings.length : 0;
+        const remaining = f.seats - booked;
+        const statusText = remaining <= 0 ? 'Fully Booked' : `${remaining} seat(s)`;
+        const statusClass = remaining <= 0 ? 'status-full' : 'status-available';
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${f.flightNumber}</td>
+          <td>${f.from}</td>
+          <td>${f.to}</td>
+          <td>${f.date}</td>
+          <td>${f.time || ''}</td>
+          <td class="${statusClass}">${statusText}</td>
+        `;
+        table.appendChild(row);
+      });
+    }
+
     fetch('/api/flights')
       .then(res => res.json())
       .then(flights => {
-        const table = document.querySelector("#flightsTable tbody");
-        flights.forEach(f => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${f.flightNumber}</td>
-            <td>${f.from}</td>
-            <td>${f.to}</td>
-            <td>${f.date}</td>
-          `;
-          table.appendChild(row);
-        });
+        allFlights = flights;
+        renderFlights(allFlights);
       });
+
+    document.getElementById("searchInput").addEventListener("input", function () {
+      const query = this.value.toLowerCase();
+      const filtered = allFlights.filter(f =>
+        f.from.toLowerCase().includes(query) ||
+        f.to.toLowerCase().includes(query) ||
+        f.date.includes(query)
+      );
+      renderFlights(filtered);
+    });
   </script>
 </body>
 </html>

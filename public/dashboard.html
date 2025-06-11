@@ -1,22 +1,63 @@
+<!-- public/dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Dashboard</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 30px;
+    }
+    header {
+      background-color: #0f172a;
+      padding: 20px;
+      text-align: center;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    header img {
+      height: 40px;
+      border-radius: 8px;
+    }
+    header h2 {
+      color: white;
+      margin: 0;
+    }
+    nav a {
+      margin: 0 12px;
+      text-decoration: none;
+      font-weight: bold;
+      color: #60a5fa;
+      border: 1px solid transparent;
+      padding: 8px 14px;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+    nav a:hover {
+      background: #1e293b;
+      border-color: #3b82f6;
+    }
+  </style>
 </head>
 <body>
-  <h2>✈️ Flight Management System</h2>
+  <header>
+    <img src="aeroconnect-logo.png" alt="AeroConnect Logo">
+    <h2>AeroConnect – Flight Management System</h2>
+  </header>
+
   <p id="welcome">Welcome!</p>
-
-  <nav id="navbar">
-    <!-- Navigation links added via JS -->
-  </nav>
-
+  <nav id="navbar"></nav>
   <p>Welcome! Choose an option to manage flights.</p>
 
   <script>
-    // Get user from session
     fetch('/api/current-user')
       .then(res => res.json())
       .then(user => {
@@ -26,15 +67,20 @@
 
         const nav = document.getElementById("navbar");
 
-        let links = `
-          <a href="/old-index.html">📊 Dashboard</a> |
-          <a href="/view-bookings.html">📋 View Bookings</a> |
-        `;
+        let links = `<a href="/old-index.html">📊 Dashboard</a>`;
 
         if (user.role === 'admin') {
-          links += `<a href="/add-flight.html">➕ Add Flight</a> |`;
+          links += `
+            <a href="/add-flight.html">➕ Add Flight</a>
+            <a href="/book-flight.html">🎟️ Book Ticket</a>
+            <a href="/view-flights.html">🛫 View Flights</a>
+            <a href="/view-bookings.html">📋 View Bookings</a>
+          `;
         } else {
-          links += `<a href="/my-bookings.html">🧾 My Bookings</a> |`;
+          links += `
+            <a href="/book-flight.html">🎟️ Book Ticket</a>
+            <a href="/my-bookings.html">🧾 My Bookings</a>
+          `;
         }
 
         links += `<a href="/logout">🚪 Logout</a>`;

@@ -2,15 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>🧾 My Bookings</title>
+  <title>🧾 My Bookings - AeroConnect</title>
   <link rel="stylesheet" href="style.css">
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f1f5f9;
-      color: #1e293b;
+      background-color: #0f172a;
+      color: white;
       padding: 30px;
       text-align: center;
+    }
+
+    header {
+      background-color: #0f172a;
+      padding: 20px;
+      text-align: center;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    header img {
+      height: 40px;
+      border-radius: 8px;
     }
 
     h2 {
@@ -23,6 +39,7 @@
       width: 90%;
       border-collapse: collapse;
       background: white;
+      color: #1e293b;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
 
@@ -62,6 +79,7 @@
 
     #confirmModal .modal-content {
       background: white;
+      color: #1e293b;
       padding: 20px;
       border-radius: 10px;
       width: 300px;
@@ -80,6 +98,11 @@
   </style>
 </head>
 <body>
+  <header>
+    <img src="aeroconnect-logo.png" alt="AeroConnect Logo">
+    <h1>AeroConnect – Flight Management System</h1>
+  </header>
+
   <h2>🧾 My Bookings</h2>
 
   <table id="bookingsTable">

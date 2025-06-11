@@ -93,5 +93,10 @@
     "username": "Maryanne Ndungu",
     "password": "qwert",
     "role": "user"
+  },
+  {
+    "username": "Odobert",
+    "password": "12345",
+    "role": "user"
   }
 ]
