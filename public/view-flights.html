@@ -59,19 +59,30 @@
 
     button {
       padding: 6px 10px;
-      background: #ef4444;
-      color: white;
+      margin: 2px;
       border: none;
       border-radius: 6px;
       cursor: pointer;
+      color: white;
     }
 
-    button:hover {
+    .delete-btn {
+      background: #ef4444;
+    }
+
+    .delete-btn:hover {
       background: #dc2626;
     }
 
-    /* 🧱 Modal styles */
-    #confirmModal {
+    .edit-btn {
+      background: #3b82f6;
+    }
+
+    .edit-btn:hover {
+      background: #2563eb;
+    }
+
+    .modal {
       display: none;
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -80,22 +91,27 @@
       align-items: center;
     }
 
-    #confirmModal .modal-content {
+    .modal-content {
       background: white;
       padding: 20px;
       border-radius: 10px;
-      width: 300px;
+      width: 320px;
       text-align: center;
       box-shadow: 0 0 10px rgba(0,0,0,0.3);
     }
 
-    #confirmModal .modal-buttons {
-      margin-top: 20px;
+    .modal-content input {
+      margin-bottom: 10px;
+      padding: 8px;
+      width: 90%;
     }
 
-    #confirmModal button {
-      margin: 0 10px;
-      padding: 8px 16px;
+    .modal-buttons {
+      margin-top: 15px;
+    }
+
+    .modal-buttons button {
+      margin: 0 8px;
     }
   </style>
 </head>
@@ -115,14 +131,15 @@
         <th>From</th>
         <th>To</th>
         <th>Date</th>
+        <th>Time</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
 
-  <!-- ✅ Modal HTML -->
-  <div id="confirmModal">
+  <!-- 🧱 Delete Modal -->
+  <div id="confirmModal" class="modal">
     <div class="modal-content">
       <p id="confirmText">Are you sure?</p>
       <div class="modal-buttons">
@@ -132,10 +149,26 @@
     </div>
   </div>
 
+  <!-- ✏️ Edit Modal -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <h3>Edit Flight</h3>
+      <input id="editFlightNumber" placeholder="Flight Number" />
+      <input id="editFrom" placeholder="From" />
+      <input id="editTo" placeholder="To" />
+      <input id="editDate" type="date" placeholder="Date" />
+      <input id="editTime" type="time" placeholder="Time" />
+      <div class="modal-buttons">
+        <button onclick="submitEdit()">💾 Save</button>
+        <button onclick="closeEditModal()">❌ Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     let flightToDeleteId = null;
+    let flightToEditId = null;
 
-    // Load flights and user
     fetch('/api/current-user')
       .then(res => res.json())
       .then(user => {
@@ -152,14 +185,53 @@
                 <td>${flight.from}</td>
                 <td>${flight.to}</td>
                 <td>${flight.date}</td>
+                <td>${flight.time || '—'}</td>
                 <td>
-                  ${isAdmin ? `<button onclick="promptDelete(${flight.id}, '${flight.flightNumber}')">🗑️ Delete</button>` : ''}
+                  ${isAdmin ? `
+                    <button class="edit-btn" onclick="openEditModal(${flight.id}, '${flight.flightNumber}', '${flight.from}', '${flight.to}', '${flight.date}', '${flight.time || ''}')">✏️ Edit</button>
+                    <button class="delete-btn" onclick="promptDelete(${flight.id}, '${flight.flightNumber}')">🗑️ Delete</button>
+                  ` : ''}
                 </td>
               `;
               tbody.appendChild(row);
             });
           });
       });
+
+    function openEditModal(id, number, from, to, date, time) {
+      flightToEditId = id;
+      document.getElementById("editFlightNumber").value = number;
+      document.getElementById("editFrom").value = from;
+      document.getElementById("editTo").value = to;
+      document.getElementById("editDate").value = date;
+      document.getElementById("editTime").value = time;
+      document.getElementById("editModal").style.display = "flex";
+    }
+
+    function closeEditModal() {
+      document.getElementById("editModal").style.display = "none";
+    }
+
+    function submitEdit() {
+      const updated = {
+        flightNumber: document.getElementById("editFlightNumber").value,
+        from: document.getElementById("editFrom").value,
+        to: document.getElementById("editTo").value,
+        date: document.getElementById("editDate").value,
+        time: document.getElementById("editTime").value
+      };
+
+      fetch(`/api/flights/${flightToEditId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated)
+      })
+      .then(res => res.text())
+      .then(msg => {
+        alert(msg);
+        location.reload();
+      });
+    }
 
     function promptDelete(id, flightNumber) {
       flightToDeleteId = id;

@@ -54,9 +54,6 @@ app.post('/signup', (req, res) => {
   res.redirect('/dashboard.html');
 });
 
-
-
-
 // ✅ Login
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
@@ -72,15 +69,14 @@ app.post('/login', (req, res) => {
   res.redirect('/dashboard.html');
 });
 
-
 // 🔓 Logout
 app.get('/logout', (req, res) => {
   req.session.destroy(err => {
     res.redirect('/login.html');
   });
 });
+
 // 🧠 Session info API
-// ✅ Return session info to frontend
 app.get('/session-info', (req, res) => {
   if (req.session && req.session.user) {
     res.json({ username: req.session.user, role: req.session.role });
@@ -88,9 +84,6 @@ app.get('/session-info', (req, res) => {
     res.status(401).json({ error: 'Not logged in' });
   }
 });
-
-
-
 
 // ✅ Get all flights
 app.get('/api/flights', (req, res) => {
@@ -103,10 +96,10 @@ app.get('/api/flights', (req, res) => {
   }
 });
 
-// ✅ Add new flight
+// ✅ Add new flight (includes time)
 app.post('/api/flights', (req, res) => {
-  const { flightNumber, from, to, date } = req.body;
-  const newFlight = { id: Date.now(), flightNumber, from, to, date };
+  const { flightNumber, from, to, date, time } = req.body;
+  const newFlight = { id: Date.now(), flightNumber, from, to, date, time };
 
   const filePath = path.join(__dirname, 'data', 'flights.json');
   const flights = JSON.parse(fs.readFileSync(filePath, 'utf8') || '[]');
@@ -132,11 +125,10 @@ app.post('/api/bookings', (req, res) => {
 
   const newBooking = {
     id: Date.now(),
-    passengerName: passengerName || req.session.user?.username,  // ✅ If passengerName is in form, use it
+    passengerName: passengerName || req.session.user?.username,
     flightNumber,
     date: new Date().toISOString().split('T')[0]
   };
-
 
   const filePath = path.join(__dirname, 'data', 'bookings.json');
   const bookings = JSON.parse(fs.readFileSync(filePath, 'utf8') || '[]');
@@ -167,7 +159,6 @@ app.delete('/api/my-bookings/:id', (req, res) => {
   const bookings = JSON.parse(fs.readFileSync(filePath, 'utf8') || '[]');
 
   const booking = bookings.find(b => b.id === bookingId);
-
   if (!booking || booking.passengerName !== username) {
     return res.status(403).send('⛔ Not allowed to delete this booking.');
   }
@@ -176,9 +167,6 @@ app.delete('/api/my-bookings/:id', (req, res) => {
   fs.writeFileSync(filePath, JSON.stringify(updated, null, 2));
   res.send('✅ Booking cancelled.');
 });
-
-
-
 
 app.get('/dashboard-data', (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
@@ -199,6 +187,22 @@ app.delete('/api/flights/:id', (req, res) => {
   res.send("✅ Flight deleted.");
 });
 
+// ✅ Update (Edit) flight
+app.put('/api/flights/:id', (req, res) => {
+  const flightId = parseInt(req.params.id);
+  const filePath = path.join(__dirname, 'data', 'flights.json');
+  try {
+    let flights = JSON.parse(fs.readFileSync(filePath, 'utf8') || '[]');
+    const index = flights.findIndex(f => f.id === flightId);
+    if (index === -1) return res.status(404).send("Flight not found.");
+
+    flights[index] = { ...flights[index], ...req.body };
+    fs.writeFileSync(filePath, JSON.stringify(flights, null, 2));
+    res.send("✅ Flight updated successfully.");
+  } catch (err) {
+    res.status(500).send("❌ Error updating flight.");
+  }
+});
 
 // ✅ Who is logged in?
 app.get('/api/current-user', (req, res) => {
@@ -209,9 +213,6 @@ app.get('/api/current-user', (req, res) => {
 app.get('/api/me', (req, res) => {
   res.json(req.session.user || {});
 });
-
-
-
 
 // ✅ Start server
 app.listen(PORT, () => {

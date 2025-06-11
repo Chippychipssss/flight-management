@@ -88,5 +88,10 @@
     "username": "Maryanne",
     "password": "mayyan",
     "role": "user"
+  },
+  {
+    "username": "Maryanne Ndungu",
+    "password": "qwert",
+    "role": "user"
   }
 ]
