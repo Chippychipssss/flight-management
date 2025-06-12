@@ -98,5 +98,10 @@
     "username": "Odobert",
     "password": "12345",
     "role": "user"
+  },
+  {
+    "username": "wanene",
+    "password": "12345",
+    "role": "user"
   }
 ]

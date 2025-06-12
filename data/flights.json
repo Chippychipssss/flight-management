@@ -187,5 +187,41 @@
     "seats": 2,
     "date": "2025-06-11",
     "time": "16:08"
+  },
+  {
+    "id": 1749713509594,
+    "flightNumber": "KQ123",
+    "from": "Nairobi",
+    "to": "Cairo",
+    "route": "Eritrea",
+    "class": "Economy",
+    "price": "60000",
+    "seats": 5,
+    "date": "2025-06-20",
+    "time": "10:00"
+  },
+  {
+    "id": 1749713906255,
+    "flightNumber": "KQ123",
+    "from": "Nairobi",
+    "to": "Cairo",
+    "route": "Eritrea",
+    "class": "Economy",
+    "price": "50000",
+    "seats": 20,
+    "date": "2025-06-22",
+    "time": "10:37"
+  },
+  {
+    "id": 1749716924924,
+    "flightNumber": "KQ140",
+    "from": "Nairobi",
+    "to": "Amsterdam",
+    "route": "Dubai",
+    "class": "Economy",
+    "price": "40000",
+    "seats": 1,
+    "date": "2025-06-12",
+    "time": "11:28"
   }
 ]
