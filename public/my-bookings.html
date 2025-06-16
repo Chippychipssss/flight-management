@@ -107,7 +107,7 @@
 
   <table id="bookingsTable">
     <thead>
-      <tr><th>Flight</th><th>Date</th><th>Cancel</th></tr>
+      <tr><th>Flight</th><th>Date</th><th>Seat</th><th>Cancel</th></tr>
     </thead>
     <tbody></tbody>
   </table>
@@ -138,7 +138,10 @@
             row.innerHTML = `
               <td>${b.flightNumber}</td>
               <td>${b.date}</td>
-              <td><button onclick="promptCancel(${b.id}, '${b.flightNumber}')">❌ Cancel</button></td>
+              <td>${b.seatNumber ? 'Seat ' + b.seatNumber : '—'}</td>
+
+
+              <td><button onclick="promptCancel('${b._id}', '${b.flightNumber}')">❌ Cancel</button></td>
             `;
             table.appendChild(row);
           });

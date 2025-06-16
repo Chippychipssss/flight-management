@@ -1,4 +1,3 @@
-<!-- public/old-index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,8 +22,6 @@
     header {
       background-color: var(--brand-blue);
       padding: 20px;
-      text-align: center;
-      color: var(--text-light);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -79,6 +76,26 @@
       color: green;
       font-weight: bold;
     }
+
+    #flightsTable,
+    #searchInput,
+    #userNote,
+    #noResults {
+      display: none;
+    }
+
+    #searchInput {
+      padding: 10px;
+      width: 60%;
+      margin: 20px auto 10px;
+      display: block;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+    }
+
+    #userNote {
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
@@ -91,9 +108,12 @@
   <nav id="navLinks"></nav>
   <p>Choose an option to manage flights.</p>
 
-  <input type="text" id="searchInput" placeholder="Search by destination or date..." style="padding: 10px; width: 60%; margin-top: 10px; border-radius: 6px; border: 1px solid #cbd5e1;">
+  <p id="userNote"></p>
+  <input type="text" id="searchInput" placeholder="Search by destination or date...">
 
   <h3>🛫 Available Flights</h3>
+  <p id="noResults">No flights found for your search.</p>
+
   <table id="flightsTable">
     <thead>
       <tr>
@@ -109,11 +129,23 @@
   </table>
 
   <script>
+    let currentUserRole = "";
+
+    const table = document.querySelector("#flightsTable tbody");
+    const searchInput = document.getElementById("searchInput");
+    const flightsTable = document.getElementById("flightsTable");
+    const userNote = document.getElementById("userNote");
+    const noResults = document.getElementById("noResults");
+    let allFlights = [];
+
+    // Fetch user info
     fetch('/api/me')
       .then(res => res.json())
       .then(user => {
         if (!user.username) return location.href = '/login.html';
+
         document.getElementById('userWelcome').innerText = `Welcome, ${user.username}!`;
+        currentUserRole = user.role;
 
         let links = `<a href="old-index.html">📊 Dashboard</a>`;
         if (user.role === 'admin') {
@@ -127,18 +159,58 @@
           links += `
             <a href="book-flight.html">🎟️ Book Ticket</a>
             <a href="my-bookings.html">🧾 My Bookings</a>
+            <a href="edit-account.html">✏️ Edit Account</a>
           `;
         }
         links += `<a href="/logout">🚪 Logout</a>`;
         document.getElementById("navLinks").innerHTML = links;
       });
 
-    const table = document.querySelector("#flightsTable tbody");
-    let allFlights = [];
+    // Fetch flights after role is ready
+    fetch('/api/flights')
+      .then(res => res.json())
+      .then(flights => {
+        allFlights = flights;
+
+        const interval = setInterval(() => {
+          if (!currentUserRole) return;
+          clearInterval(interval);
+
+          // Display after role is loaded
+          if (currentUserRole === 'user') {
+            userNote.innerHTML = `
+              ✨ Welcome to AeroConnect!  
+              Use the <strong>Book Ticket</strong> page to search and reserve flights.
+              <br><br>
+              Popular routes:
+              <ul style="list-style: none; padding: 0;">
+                <li>✈️ Nairobi → Cape Town</li>
+                <li>✈️ Mombasa → Daresalaam</li>
+                <li>✈️ New York → Kenya</li>
+              </ul>
+            `;
+            userNote.style.display = "block";
+          }
+
+          searchInput.style.display = "block";
+          flightsTable.style.display = "table";
+          renderFlights(allFlights);
+        }, 100);
+      });
 
     function renderFlights(flights) {
       table.innerHTML = "";
-      flights.forEach(f => {
+      noResults.style.display = "none";
+
+      const visibleFlights = currentUserRole === 'user'
+        ? flights.filter(f => (f.seats - (f.bookings?.length || 0)) > 0)
+        : flights;
+
+      if (visibleFlights.length === 0) {
+        noResults.style.display = "block";
+      }
+
+      visibleFlights.forEach(f => {
         const booked = f.bookings ? f.bookings.length : 0;
         const remaining = f.seats - booked;
         const statusText = remaining <= 0 ? 'Fully Booked' : `${remaining} seat(s)`;
@@ -157,14 +229,7 @@
       });
     }
 
-    fetch('/api/flights')
-      .then(res => res.json())
-      .then(flights => {
-        allFlights = flights;
-        renderFlights(allFlights);
-      });
-
-    document.getElementById("searchInput").addEventListener("input", function () {
+    searchInput.addEventListener("input", function () {
       const query = this.value.toLowerCase();
       const filtered = allFlights.filter(f =>
         f.from.toLowerCase().includes(query) ||

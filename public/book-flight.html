@@ -104,16 +104,18 @@
       .then(data => {
         flights = data;
         data.forEach(flight => {
-          const bookings = flight.bookings || [];
-          const seats = parseInt(flight.seats) || 0;
-          const remaining = seats - bookings.length;
-          const status = seats === 0 ? ' (No seats)' : (remaining <= 0 ? ' (Fully Booked)' : ` (${remaining} seat(s))`);
-          const option = document.createElement("option");
-          option.value = `${flight.flightNumber}|${flight.date}`;
-          option.text = `${flight.flightNumber} - ${flight.from} → ${flight.to} (${flight.date})${status}`;
-          option.disabled = remaining <= 0;
-          flightSelect.appendChild(option);
-        });
+  const bookings = flight.bookings || [];
+  const seats = parseInt(flight.seats) || 0;
+  const remaining = seats - bookings.length;
+
+  if (remaining > 0) {
+    const option = document.createElement("option");
+    option.value = `${flight.flightNumber}|${flight.date}`;
+    option.text = `${flight.flightNumber} - ${flight.from} → ${flight.to} (${flight.date}) (${remaining} seat${remaining > 1 ? 's' : ''})`;
+    flightSelect.appendChild(option);
+  }
+});
+
       });
 
     flightSelect.addEventListener("change", () => {

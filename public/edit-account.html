@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>✏️ Edit Account - AeroConnect</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0f172a;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    form {
+      background: white;
+      color: black;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      width: 350px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #1d4ed8;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+  </style>
+</head>
+<body>
+  <h2>✏️ Edit Your Account</h2>
+  <form method="POST" action="/api/edit-account">
+  <input type="text" name="newUsername" placeholder="New Username (optional)">
+  <input type="password" name="newPassword" placeholder="New Password (optional)">
+  <button type="submit">Update</button>
+</form>
+
+  <script>
+    // Prefill current user info
+    fetch('/api/me')
+      .then(res => res.json())
+      .then(user => {
+        if (user?.username) {
+          document.getElementById('username').value = user.username;
+        }
+      });
+
+    // Handle update
+    document.getElementById('editForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const body = {
+        username: form.username.value,
+        password: form.password.value
+      };
+
+      const res = await fetch('/api/edit-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      const msg = await res.text();
+      alert(msg);
+      if (res.ok) window.location.href = '/dashboard.html';
+    });
+  </script>
+</body>
+</html>

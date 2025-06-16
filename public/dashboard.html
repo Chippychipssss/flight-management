@@ -59,34 +59,36 @@
 
   <script>
     fetch('/api/current-user')
-      .then(res => res.json())
-      .then(user => {
-        if (!user.username) return location.href = '/login.html';
+  .then(res => res.json())
+  .then(user => {
+    if (!user.username) return location.href = '/login.html';
 
-        document.getElementById("welcome").innerText = `Welcome, ${user.username}!`;
+    document.getElementById("welcome").innerText = `Welcome, ${user.username}!`;
 
-        const nav = document.getElementById("navbar");
+    const nav = document.getElementById("navbar");
 
-        let links = `<a href="/old-index.html">📊 Dashboard</a>`;
+    let links = `<a href="/old-index.html">📊 Dashboard</a>`;
 
-        if (user.role === 'admin') {
-          links += `
-            <a href="/add-flight.html">➕ Add Flight</a>
-            <a href="/book-flight.html">🎟️ Book Ticket</a>
-            <a href="/view-flights.html">🛫 View Flights</a>
-            <a href="/view-bookings.html">📋 View Bookings</a>
-          `;
-        } else {
-          links += `
-            <a href="/book-flight.html">🎟️ Book Ticket</a>
-            <a href="/my-bookings.html">🧾 My Bookings</a>
-          `;
-        }
+    if (user.role === 'admin') {
+      links += `
+        <a href="/add-flight.html">➕ Add Flight</a>
+        <a href="/book-flight.html">🎟️ Book Ticket</a>
+        <a href="/view-flights.html">🛫 View Flights</a>
+        <a href="/view-bookings.html">📋 View Bookings</a>
+      `;
+    } else {
+      links += `
+        <a href="/book-flight.html">🎟️ Book Ticket</a>
+        <a href="/my-bookings.html">🧾 My Bookings</a>
+      `;
+    }
 
-        links += `<a href="/logout">🚪 Logout</a>`;
-        nav.innerHTML = links;
-      })
-      .catch(() => location.href = '/login.html');
+    links += `<a href="/edit-account.html">✏️ Edit Account</a>`;
+    links += `<a href="/logout">🚪 Logout</a>`;
+    nav.innerHTML = links;
+  })
+  .catch(() => location.href = '/login.html');
+
   </script>
 </body>
 </html>
