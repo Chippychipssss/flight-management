@@ -1,3 +1,4 @@
+require('dotenv').config(); // ✅ Load .env for MongoDB Atlas
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
@@ -8,12 +9,13 @@ const sendConfirmationEmail = require('./utils/email'); // ✅ Email utility
 const app = express();
 const PORT = 3000;
 
-// ✅ MongoDB connection
-mongoose.connect('mongodb://localhost:27017/aeroconnect').then(() => {
-  console.log("✅ MongoDB connected locally.");
-}).catch(err => {
-  console.error("❌ MongoDB connection failed:", err);
-});
+ // ✅ MongoDB connection
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log("✅ Connected to MongoDB Atlas"))
+  .catch(err => {
+    console.error("❌ MongoDB connection failed:", err);
+  });
+
 
 // ✅ Import Mongoose models
 const User = require('./models/User');

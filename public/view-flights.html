@@ -209,28 +209,29 @@
     const tbody = document.querySelector("#flightsTable tbody");
 
     function renderFlights(flights, isAdmin) {
-      tbody.innerHTML = "";
-      flights.forEach(flight => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${flight.flightNumber}</td>
-          <td>${flight.from}</td>
-          <td>${flight.to}</td>
-          <td>${flight.date}</td>
-          <td>${flight.time || '—'}</td>
-          <td>${flight.route || '—'}</td>
-          <td>${flight.class || '—'}</td>
-          <td>KSH ${flight.price || '—'}</td>
-          <td>
-            ${isAdmin ? `
-              <button class="edit-btn" onclick="openEditModal(${flight.id}, '${flight.flightNumber}', '${flight.from}', '${flight.to}', '${flight.date}', '${flight.time || ''}', '${flight.route || ''}', '${flight.class || ''}', '${flight.price || ''}')">✏️ Edit</button>
-              <button class="delete-btn" onclick="promptDelete(${flight.id}, '${flight.flightNumber}')">🗑️ Delete</button>
-            ` : ''}
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
-    }
+  tbody.innerHTML = "";
+  flights.forEach(flight => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${flight.flightNumber}</td>
+      <td>${flight.from}</td>
+      <td>${flight.to}</td>
+      <td>${flight.date}</td>
+      <td>${flight.time || '—'}</td>
+      <td>${flight.route || '—'}</td>
+      <td>${flight.class || '—'}</td>
+      <td>KSH ${flight.price || '—'}</td>
+      <td>
+        ${isAdmin ? `
+          <button class="edit-btn" onclick="openEditModal('${flight._id}', '${flight.flightNumber}', '${flight.from}', '${flight.to}', '${flight.date}', '${flight.time || ''}', '${flight.route || ''}', '${flight.class || ''}', '${flight.price || ''}')">✏️ Edit</button>
+          <button class="delete-btn" onclick="promptDelete('${flight._id}', '${flight.flightNumber}')">🗑️ Delete</button>
+        ` : ''}
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
 
     fetch('/api/current-user')
       .then(res => res.json())
