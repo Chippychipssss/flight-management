@@ -73,18 +73,62 @@ app.get('/logout', (req, res) => {
 app.get('/api/me', (req, res) => res.json(req.session.user || {}));
 app.get('/api/current-user', (req, res) => res.json(req.session.user || {}));
 
+// ✅ Search flights with seat availability
+app.get('/api/search-flights', async (req, res) => {
+  const { from, to, date, class: travelClass } = req.query;
+
+  let query = {};
+  if (from) query.from = from;
+  if (to) query.to = to;
+  if (date) query.date = date;
+  if (travelClass) query.class = travelClass;
+
+  const allFlights = await Flight.find(query);
+  const bookings = await Booking.find();
+
+  const available = [];
+  const full = [];
+
+  allFlights.forEach(flight => {
+    const matches = bookings.filter(b => b.flightNumber === flight.flightNumber && b.date === flight.date);
+    const remaining = flight.seats - matches.length;
+    const enriched = { ...flight._doc, bookedSeats: matches.length, remainingSeats: remaining };
+
+    if (remaining > 0) {
+      available.push(enriched);
+    } else {
+      full.push(enriched);
+    }
+  });
+
+  res.json({ available, full });
+});
+
+
+
+
+
 // ✅ Get all flights with booking count
 app.get('/api/flights', async (req, res) => {
+  const { status } = req.query;
   const flights = await Flight.find();
   const bookings = await Booking.find();
 
   const enriched = flights.map(flight => {
     const matching = bookings.filter(b => b.flightNumber === flight.flightNumber && b.date === flight.date);
-    return { ...flight._doc, bookings: matching };
+    const isFull = matching.length >= flight.seats;
+    return { ...flight._doc, bookings: matching, status: isFull ? 'full' : 'available' };
   });
+
+  if (status === 'full') {
+    return res.json(enriched.filter(f => f.status === 'full'));
+  } else if (status === 'available') {
+    return res.json(enriched.filter(f => f.status === 'available'));
+  }
 
   res.json(enriched);
 });
+
 
 // ✅ Add new flight
 app.post('/api/flights', async (req, res) => {

@@ -84,6 +84,12 @@
     a:hover {
       text-decoration: underline;
     }
+
+    small {
+      font-size: 0.85em;
+      color: #cbd5e1;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -93,13 +99,11 @@
   </header>
 
   <form action="/signup" method="POST">
-    <input type="text" name="username" placeholder="Username" required>
+    <input type="text" name="username" placeholder="Email or Username" required>
     <input type="password" name="password" placeholder="Password" required>
-
-    <!-- 🔐 Hidden role field -->
     <input type="hidden" name="role" value="user">
-
     <button type="submit">Sign Up</button>
+    <small>Use an email to receive flight confirmations.</small>
   </form>
 
   <p>Already have an account? <a href="/login.html">Login</a></p>

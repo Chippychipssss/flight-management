@@ -12,7 +12,6 @@
       padding: 30px;
       text-align: center;
     }
-
     header {
       background-color: #0f172a;
       padding: 20px;
@@ -21,21 +20,17 @@
       justify-content: center;
       gap: 12px;
     }
-
     header img {
       height: 40px;
       border-radius: 8px;
     }
-
     h2 {
       font-size: 1.8rem;
       margin: 20px 0;
     }
-
-    form {
+    form, #filters {
       margin-top: 20px;
     }
-
     input, select {
       padding: 10px;
       margin: 10px;
@@ -43,7 +38,6 @@
       border-radius: 8px;
       border: 1px solid #ccc;
     }
-
     button {
       padding: 10px 20px;
       background-color: #2563eb;
@@ -53,14 +47,28 @@
       cursor: pointer;
       transition: 0.3s;
     }
-
     button:hover {
       background-color: #1d4ed8;
     }
-
     #msg {
       margin-top: 20px;
       font-weight: bold;
+    }
+    #results {
+      margin-top: 30px;
+      text-align: left;
+      padding-left: 20%;
+      padding-right: 20%;
+    }
+    .hidden {
+      display: none;
+    }
+    h3 {
+      color: #60a5fa;
+      margin-top: 30px;
+    }
+    p {
+      margin: 6px 0;
     }
   </style>
 </head>
@@ -72,58 +80,133 @@
 
   <h2>🎟️ Book a Flight</h2>
 
-  <form id="bookingForm">
-    <input type="text" id="passengerName" name="passengerName" placeholder="Passenger Name" required readonly>
-    
-    <select id="flightNumber" name="flightNumber" required>
-      <option value="">✈️ Select Flight Number</option>
+  <div id="filters">
+    <select id="from"><option value="">From</option></select>
+    <select id="to"><option value="">To</option></select>
+    <input type="date" id="filterDate">
+    <select id="class">
+      <option value="">Class</option>
+      <option value="Economy">Economy</option>
+      <option value="Business">Business</option>
+      <option value="First Class">First Class</option>
     </select>
+    <button onclick="searchFlights()">Search Flights</button>
+  </div>
 
+  <form id="bookingForm" class="hidden">
+    <input type="text" id="passengerName" name="passengerName" placeholder="Passenger Name" required readonly>
+    <select id="flightNumber" name="flightNumber" required>
+      <option value="">✈️ Select Flight</option>
+    </select>
     <input type="date" id="date" name="date" required readonly>
     <br>
     <button type="submit">Book Ticket</button>
     <div id="msg"></div>
   </form>
 
+  <div id="results"></div>
+
   <script>
     const userField = document.getElementById("passengerName");
     const flightSelect = document.getElementById("flightNumber");
     const dateField = document.getElementById("date");
+    const form = document.getElementById("bookingForm");
     const msg = document.getElementById("msg");
-    let flights = [];
+    const resultsDiv = document.getElementById("results");
+    let currentUser;
 
-    fetch('/api/me')
+    // 👤 Get current user
+    fetch('/api/current-user')
       .then(res => res.json())
       .then(user => {
+        currentUser = user;
         if (!user.username) return location.href = '/login.html';
-        userField.value = user.username;
+        if (user.role === 'admin') {
+          document.body.innerHTML = '<h2>⛔ Booking not allowed for admin accounts.</h2>';
+        } else {
+          userField.value = user.username;
+          form.classList.remove('hidden');
+        }
       });
 
-    fetch('/api/flights')
-      .then(res => res.json())
-      .then(data => {
-        flights = data;
-        data.forEach(flight => {
-  const bookings = flight.bookings || [];
-  const seats = parseInt(flight.seats) || 0;
-  const remaining = seats - bookings.length;
-
-  if (remaining > 0) {
-    const option = document.createElement("option");
-    option.value = `${flight.flightNumber}|${flight.date}`;
-    option.text = `${flight.flightNumber} - ${flight.from} → ${flight.to} (${flight.date}) (${remaining} seat${remaining > 1 ? 's' : ''})`;
-    flightSelect.appendChild(option);
-  }
-});
-
+    // 📥 Populate From/To filters
+    async function populateFilters() {
+      const res = await fetch('/api/flights');
+      const data = await res.json();
+      const fromSet = new Set();
+      const toSet = new Set();
+      data.forEach(f => {
+        fromSet.add(f.from);
+        toSet.add(f.to);
       });
+      for (let val of fromSet) {
+        document.getElementById("from").innerHTML += `<option value="${val}">${val}</option>`;
+      }
+      for (let val of toSet) {
+        document.getElementById("to").innerHTML += `<option value="${val}">${val}</option>`;
+      }
+    }
 
+    populateFilters();
+
+    // 🔍 Search flights and show available + full
+    async function searchFlights() {
+      const from = document.getElementById("from").value.trim();
+      const to = document.getElementById("to").value.trim();
+      const date = document.getElementById("filterDate").value;
+      const travelClass = document.getElementById("class").value.trim();
+
+      const query = new URLSearchParams({ from, to, date, class: travelClass });
+      const res = await fetch(`/api/search-flights?${query}`);
+      const { available, full } = await res.json();
+
+      flightSelect.innerHTML = '<option value="">✈️ Select Flight</option>';
+      resultsDiv.innerHTML = '';
+
+      if (available.length === 0 && full.length === 0) {
+        resultsDiv.textContent = "❌ No flights found.";
+        return;
+      }
+
+      if (available.length > 0) {
+        const availableHeader = document.createElement("h3");
+        availableHeader.textContent = "🟢 Available Flights:";
+        resultsDiv.appendChild(availableHeader);
+
+        available.forEach(f => {
+          const option = document.createElement("option");
+          option.value = `${f.flightNumber}|${f.date}`;
+          option.textContent = `${f.flightNumber} - ${f.from} → ${f.to} (${f.date}) [${f.class}] - ${f.remainingSeats} seat(s)`;
+          flightSelect.appendChild(option);
+
+          const p = document.createElement("p");
+          p.textContent = `${f.flightNumber} - ${f.from} → ${f.to} (${f.date}) [${f.class}] - ${f.remainingSeats} seat(s)`;
+          resultsDiv.appendChild(p);
+        });
+      }
+
+      if (full.length > 0) {
+        const fullHeader = document.createElement("h3");
+        fullHeader.textContent = "🔴 Fully Booked Flights:";
+        resultsDiv.appendChild(fullHeader);
+
+        full.forEach(f => {
+          const p = document.createElement("p");
+          p.textContent = `${f.flightNumber} - ${f.from} → ${f.to} (${f.date}) [${f.class}] - Fully Booked`;
+          p.style.color = "gray";
+          resultsDiv.appendChild(p);
+        });
+      }
+    }
+
+    // Auto-fill date from selection
     flightSelect.addEventListener("change", () => {
       const [flightNum, date] = flightSelect.value.split("|");
-      dateField.value = date;
+      dateField.value = date || "";
     });
 
-    document.getElementById("bookingForm").addEventListener("submit", async e => {
+    // 🧾 Submit booking
+    form.addEventListener("submit", async e => {
       e.preventDefault();
       msg.textContent = "⏳ Booking...";
       msg.style.color = "white";
@@ -137,21 +220,16 @@
         body.date = date;
       }
 
-      try {
-        const res = await fetch("/api/bookings", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
 
-        const text = await res.text();
-        msg.textContent = text;
-        msg.style.color = res.ok ? "lightgreen" : "red";
-        if (res.ok) e.target.reset();
-      } catch (err) {
-        msg.textContent = "❌ Failed to book.";
-        msg.style.color = "red";
-      }
+      const text = await res.text();
+      msg.textContent = text;
+      msg.style.color = res.ok ? "lightgreen" : "red";
+      if (res.ok) form.reset();
     });
   </script>
 </body>

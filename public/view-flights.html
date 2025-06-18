@@ -47,10 +47,10 @@
       border-color: #60a5fa;
     }
 
-    #searchInput {
+    #searchInput, #statusFilter {
       padding: 10px;
-      width: 60%;
-      margin-bottom: 20px;
+      width: 30%;
+      margin: 10px;
       border-radius: 6px;
       border: 1px solid #cbd5e1;
     }
@@ -148,7 +148,13 @@
     <a href="/logout">🚪 Logout</a>
   </nav>
 
+  <!-- 🔍 Filters -->
   <input type="text" id="searchInput" placeholder="Search by destination or date..." />
+  <select id="statusFilter">
+    <option value="">🧭 Filter by Status</option>
+    <option value="available">🟢 Available</option>
+    <option value="full">🔴 Full</option>
+  </select>
 
   <table id="flightsTable">
     <thead>
@@ -209,42 +215,44 @@
     const tbody = document.querySelector("#flightsTable tbody");
 
     function renderFlights(flights, isAdmin) {
-  tbody.innerHTML = "";
-  flights.forEach(flight => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${flight.flightNumber}</td>
-      <td>${flight.from}</td>
-      <td>${flight.to}</td>
-      <td>${flight.date}</td>
-      <td>${flight.time || '—'}</td>
-      <td>${flight.route || '—'}</td>
-      <td>${flight.class || '—'}</td>
-      <td>KSH ${flight.price || '—'}</td>
-      <td>
-        ${isAdmin ? `
-          <button class="edit-btn" onclick="openEditModal('${flight._id}', '${flight.flightNumber}', '${flight.from}', '${flight.to}', '${flight.date}', '${flight.time || ''}', '${flight.route || ''}', '${flight.class || ''}', '${flight.price || ''}')">✏️ Edit</button>
-          <button class="delete-btn" onclick="promptDelete('${flight._id}', '${flight.flightNumber}')">🗑️ Delete</button>
-        ` : ''}
-      </td>
-    `;
-    tbody.appendChild(row);
-  });
-}
+      tbody.innerHTML = "";
+      flights.forEach(flight => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${flight.flightNumber}</td>
+          <td>${flight.from}</td>
+          <td>${flight.to}</td>
+          <td>${flight.date}</td>
+          <td>${flight.time || '—'}</td>
+          <td>${flight.route || '—'}</td>
+          <td>${flight.class || '—'}</td>
+          <td>KSH ${flight.price || '—'}</td>
+          <td>
+            ${isAdmin ? `
+              <button class="edit-btn" onclick="openEditModal('${flight._id}', '${flight.flightNumber}', '${flight.from}', '${flight.to}', '${flight.date}', '${flight.time || ''}', '${flight.route || ''}', '${flight.class || ''}', '${flight.price || ''}')">✏️ Edit</button>
+              <button class="delete-btn" onclick="promptDelete('${flight._id}', '${flight.flightNumber}')">🗑️ Delete</button>
+            ` : ''}
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
 
+    let currentUser;
 
     fetch('/api/current-user')
       .then(res => res.json())
       .then(user => {
-        const isAdmin = user.role === 'admin';
-        fetch('/api/flights')
-          .then(res => res.json())
-          .then(flights => {
-            allFlights = flights;
-            renderFlights(allFlights, isAdmin);
-          });
+        currentUser = user;
+        return fetch('/api/flights');
+      })
+      .then(res => res.json())
+      .then(flights => {
+        allFlights = flights;
+        renderFlights(allFlights, currentUser.role === 'admin');
       });
 
+    // 🔍 Search by destination or date
     document.getElementById("searchInput").addEventListener("input", function () {
       const query = this.value.toLowerCase();
       const filtered = allFlights.filter(f =>
@@ -252,9 +260,20 @@
         f.to.toLowerCase().includes(query) ||
         f.date.includes(query)
       );
-      fetch('/api/current-user')
+      renderFlights(filtered, currentUser.role === 'admin');
+    });
+
+    // 🧭 Filter by status (available / full)
+    document.getElementById("statusFilter").addEventListener("change", function () {
+      const status = this.value;
+      let url = '/api/flights';
+      if (status) url += `?status=${status}`;
+      fetch(url)
         .then(res => res.json())
-        .then(user => renderFlights(filtered, user.role === 'admin'));
+        .then(filtered => {
+          allFlights = filtered;
+          renderFlights(filtered, currentUser.role === 'admin');
+        });
     });
 
     function openEditModal(id, number, from, to, date, time, route, flightClass, price) {

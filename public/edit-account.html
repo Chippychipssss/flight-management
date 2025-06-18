@@ -55,15 +55,23 @@
     button:hover {
       background: #2563eb;
     }
+
+    small {
+      display: block;
+      text-align: center;
+      margin-top: 10px;
+      color: #6b7280;
+    }
   </style>
 </head>
 <body>
   <h2>✏️ Edit Your Account</h2>
-  <form method="POST" action="/api/edit-account">
-  <input type="text" name="newUsername" placeholder="New Username (optional)">
-  <input type="password" name="newPassword" placeholder="New Password (optional)">
-  <button type="submit">Update</button>
-</form>
+  <form id="editForm" method="POST" action="/api/edit-account">
+    <input type="text" name="newUsername" id="username" placeholder="New Email or Username (optional)">
+    <input type="password" name="newPassword" placeholder="New Password (optional)">
+    <button type="submit">Update</button>
+    <small>Use an email to receive booking confirmations.</small>
+  </form>
 
   <script>
     // Prefill current user info
@@ -80,8 +88,8 @@
       e.preventDefault();
       const form = e.target;
       const body = {
-        username: form.username.value,
-        password: form.password.value
+        newUsername: form.newUsername.value,
+        newPassword: form.newPassword.value
       };
 
       const res = await fetch('/api/edit-account', {

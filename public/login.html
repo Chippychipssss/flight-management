@@ -84,6 +84,12 @@
     a:hover {
       text-decoration: underline;
     }
+
+    small {
+      font-size: 0.85em;
+      color: #cbd5e1;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -93,9 +99,10 @@
   </header>
 
   <form action="/login" method="POST">
-    <input type="text" name="username" placeholder="Username" required>
+    <input type="text" name="username" placeholder="Email or Username" required>
     <input type="password" name="password" placeholder="Password" required>
     <button type="submit">Login</button>
+    <small>Use your email to receive booking confirmations.</small>
   </form>
 
   <p>Don't have an account? <a href="/signup.html">Sign Up</a></p>
